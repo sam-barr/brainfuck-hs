@@ -20,7 +20,6 @@ data BFChar = RIGHT
 type BFExp = [BFChar]
 
 -- code parser
--- need to figure '[' with unmatched ']'
 parse :: String -> (BFExp, String)
 parse []     = ([],[])
 parse (c:cs) = 
