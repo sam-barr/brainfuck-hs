@@ -1,0 +1,7 @@
+Brainfuck Interpreter
+
+Run make to compile sources. Use
+    ./bf EXAMPLE.bf
+to run brainfuck code. Use
+    ./bf
+to use interactive interpreter
