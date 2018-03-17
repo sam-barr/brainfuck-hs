@@ -2,6 +2,7 @@
 
 import Data.Char
 import Data.Bifunctor
+import System.IO
 import System.Environment
 import Tape
 
@@ -76,6 +77,32 @@ eval (b:bs, tape) = action b tape >>= eval . (bs, )
 main :: IO ()
 main = do
   args <- getArgs
-  code <- readFile (head args)
-  eval (runParse code, zeroTape)
-  return ()
+  if null args then
+    interpreter zeroTape
+  else do
+    code <- readFile (head args)
+    eval (runParse code, zeroTape)
+    return ()
+
+-- prompt user for codei nput
+prompt :: IO String
+prompt = do
+    putStr "> "
+    hFlush stdout
+    getLine
+
+-- interactive interpreter
+interpreter :: Tape Int -> IO ()
+interpreter tape = do
+  print tape
+  code <- prompt
+  if code == "quit" || code == ":q" then
+    return ()
+  else do
+    let parsedCode = runParse code
+    if null parsedCode then do
+      putStrLn "Type \"quit\" or \":q\" to quit the interpreter"
+      interpreter tape
+    else do
+      res <- eval (runParse code, tape)
+      interpreter res
