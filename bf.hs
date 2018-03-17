@@ -8,10 +8,10 @@ import Tape
 
 -- Data type for brainfuck character
 -- treats expressions in between brackets as a single character
-data BFChar = INC
+data BFChar = RIGHT
+            | LEFT
+            | INC
             | DEC
-            | ADD
-            | SUB
             | PRINT
             | READ
             | BRACKET BFExp
@@ -25,10 +25,10 @@ type BFExp = [BFChar]
 parse :: String -> (BFExp, String)
 parse []     = ([],[])
 parse (c:cs) = 
-  case c of '>' -> app INC
-            '<' -> app DEC
-            '+' -> app ADD
-            '-' -> app SUB
+  case c of '>' -> app RIGHT
+            '<' -> app LEFT
+            '+' -> app INC
+            '-' -> app DEC
             '.' -> app PRINT
             ',' -> app READ
             '[' -> first (BRACKET recExp:) (parse recRest)
@@ -56,10 +56,10 @@ type State = (BFExp, Tape Int)
 
 -- maps a brainfuck character to an action
 action :: BFChar -> Tape Int -> IO (Tape Int)
-action INC tape       = return $ moveR tape
-action DEC tape       = return $ moveL tape
-action ADD (T l v r)  = return $ T l (v+1) r
-action SUB (T l v r)  = return $ T l (v-1) r
+action RIGHT tape     = return $ moveR tape
+action LEFT tape      = return $ moveL tape
+action INC (T l v r)  = return $ T l (v+1) r
+action DEC (T l v r)  = return $ T l (v-1) r
 action PRINT tape     = putChar (chr (val tape)) >> return tape
 action READ (T l _ r) = getChar >>= \x -> return (T l (ord x) r)
 action (BRACKET exp) tape =
