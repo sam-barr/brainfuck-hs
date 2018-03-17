@@ -31,8 +31,11 @@ parse (c:cs) =
             '-' -> app DEC
             '.' -> app PRINT
             ',' -> app READ
-            '[' -> first (BRACKET recExp:) (parse recRest)
-            ']' -> ([],cs)
+            '[' -> if null recRest then 
+                     error "Unexpected EOF when parsing" 
+                   else 
+                     first (BRACKET recExp:) $ parse $ tail recRest
+            ']' -> ([],']':cs)
             _   -> rec
   where
     rec@(recExp, recRest) = parse cs
