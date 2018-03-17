@@ -15,7 +15,6 @@ data BFChar = RIGHT
             | PRINT
             | READ
             | BRACKET BFExp
-            deriving (Show)
 
 -- a brainfuck expression is just a list of brainfuck characters
 type BFExp = [BFChar]
