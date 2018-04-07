@@ -1,4 +1,5 @@
 {-# LANGUAGE TupleSections #-}
+module Brainfuck (runbf) where
 
 import Data.Char
 import Data.Bifunctor
@@ -75,8 +76,8 @@ eval :: State -> IO (Tape Int)
 eval ([],x) = return x
 eval (b:bs, tape) = action b tape >>= eval . (bs, )
 
-main :: IO ()
-main = do
+runbf :: IO ()
+runbf = do
   args <- getArgs
   if null args then
     interpreter zeroTape
