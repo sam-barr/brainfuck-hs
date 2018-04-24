@@ -16,6 +16,7 @@ data BFChar = RIGHT
             | PRINT
             | READ
             | BRACKET BFExp
+     deriving (Eq)
 
 -- a brainfuck expression is just a list of brainfuck characters
 type BFExp = [BFChar]
@@ -81,6 +82,9 @@ runbf = do
   args <- getArgs
   if null args then
     interpreter zeroTape
+  else if head args == "c" then do
+    code <- readFile (args !! 1)
+    writeFile "code.c" (cCodeStart ++ bfToC (runParse code) ++ "}")
   else do
     code <- readFile (head args)
     eval (runParse code, zeroTape)
@@ -108,3 +112,22 @@ interpreter tape = do
     else do
       res <- eval (runParse code, tape)
       interpreter res
+
+cCodeStart :: String
+cCodeStart = "#include <stdlib.h>\n#include <stdio.h>\nint main(){int* ptr = calloc(30000, 4);\n"
+
+bfToC :: BFExp -> String
+bfToC [] = ""
+bfToC (BRACKET exp:bs) = "while(*ptr){\n" ++ bfToC exp ++ "}\n" ++ bfToC bs
+bfToC (PRINT:bs) = "putchar(*ptr);\n" ++ bfToC bs
+bfToC (READ:bs) = "*ptr=getchar();\n" ++ bfToC bs
+bfToC (x:bs) = instr ++ show (1 + length xs) ++ ";\n" ++ rest
+  where
+    (xs, bs') = break (/= x) bs
+    rest = bfToC bs'
+
+    instr = case x of
+      RIGHT -> "ptr+="
+      LEFT -> "ptr-="
+      INC -> "*ptr+="
+      DEC -> "*ptr-="
